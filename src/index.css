@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+/* Custom theme configuration */
+@theme {
+  /* Custom colors - Extracted from reference design */
+  --color-app-bg: #0f0f0f;             /* Very dark, almost black */
+  --color-panel-bg: #16120f;           /* Slightly lighter (panels) */
+  --color-elevated-bg: #1e1916;        /* Panels, dialogs */
+  
+  /* Text colors from reference */
+  --color-text-primary: #ffffff;       /* White (box instructions) */
+  --color-text-secondary: #d1a574;     /* Lighter tan (tag names, values) */
+  --color-text-muted: #a08060;         /* Muted tan (parameters) */
+  --color-text-comment: #8b8080;       /* Muted gray-brown (comments) */
+  --color-text-number: #6b6b6b;        /* Muted gray (rung numbers) */
+  
+  /* Ladder logic colors - From reference image */
+  --color-rail: #d1664a;               /* Coral/orange (rails, rungs, brackets) */
+  --color-rail-hover: #f08a6e;         /* Brighter (hover state) */
+  --color-rail-selected: #f9a78c;      /* Brightest (selected) */
+  
+  /* Box element colors - From reference image */
+  --color-box-bg: #2d2a28;             /* Very dark brown/gray (timers, math) */
+  --color-box-border: #3a3632;         /* Slightly lighter (subtle border) */
+  
+  /* General borders */
+  --color-border-subtle: #2d2620;      /* Subtle borders */
+  --color-border-strong: #443d35;      /* Stronger borders */
+  
+  /* Accent color (for buttons, highlights) */
+  --color-accent: #d1664a;             /* Reuse rail color for accent */
+  
+  /* Error state */
+  --color-element-error: #d9534f;      /* Muted red */
+
+  /* Font families */
+  --font-ui: 'Geist Sans', 'Inter', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+  --font-sans: 'Geist Sans', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Custom base styles */
+@layer base {
+  * {
+    border-color: var(--color-border-subtle);
+  }
+
+  body {
+    background-color: var(--color-app-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* Add reusable component classes here */
+}
+
+/* Custom utilities */
+@layer utilities {
+  /* Add custom utility classes here */
+}
+
+/* Drag and drop animations — accent (default / invalid) */
+@keyframes pulse-border {
+  0%, 100% { 
+    opacity: 1;
+    border-color: #e07856;
+  }
+  50% { 
+    opacity: 0.6;
+    border-color: #f08a6e;
+  }
+}
+
+/* SVG variant — animates stroke + opacity instead of border-color */
+@keyframes pulse-svg-stroke {
+  0%, 100% { 
+    opacity: 0.5;
+    stroke: #e07856;
+  }
+  50% { 
+    opacity: 0.3;
+    stroke: #f08a6e;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 8px rgba(224, 120, 86, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 16px rgba(224, 120, 86, 0.7);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Drag and drop animations — green (valid position) */
+@keyframes pulse-border-valid {
+  0%, 100% {
+    opacity: 1;
+    border-color: #10b981;
+  }
+  50% {
+    opacity: 0.7;
+    border-color: #34d399;
+  }
+}
+
+@keyframes pulse-glow-valid {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.7);
+  }
+}
+
+.animate-pulse-border-valid {
+  animation: pulse-border-valid 1.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow-valid {
+  animation: pulse-glow-valid 1.5s ease-in-out infinite;
+}
+
+/* Branch rail animations */
+@keyframes branchRailFadeIn {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 100;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ===============================
+   Styled Scrollbars
+   Dark-themed scrollbars matching color scheme
+   =============================== */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16120f; /* panel-bg */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3d362f; /* subtle gray */
+  border-radius: 6px;
+  border: 2px solid #16120f; /* creates padding effect */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #524839; /* lighter on hover */
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #d1664a; /* accent on drag */
+}
+
+::-webkit-scrollbar-corner {
+  background: #16120f; /* panel-bg */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3d362f #16120f; /* thumb, track */
+}
