@@ -2,8 +2,10 @@ import { useState, useRef } from "react";
 import World from "./World";
 import GridLayer from "./layers/GridLayer";
 import AMRLayer from "./layers/AMRLayer";
+import NodeLayer from "./layers/NodeLayer";
+import PathLayer from "./layers/PathLayer";
 
-let Map = () => {
+let View = () => {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -22,6 +24,27 @@ let Map = () => {
     { id: 4, x: 600, y: 1200 },
     { id: 5, x: 1500, y: 1500 },
   ];
+
+  const nodes = [
+    { id: "1", x: 100, y: 300 },
+    { id: "2", x: 800, y: 1200 },
+  ]
+
+  const paths = [
+    {
+      id: "3",
+      start: {
+        id: "1",
+        x: 100,
+        y: 300
+      },
+      end: {
+        id: "2",
+        x: 800,
+        y: 1200
+      }
+    }
+  ]
 
   const clampOffset = (x: number, y: number, scale: number) => {
     const container = containerRef.current;
@@ -103,9 +126,17 @@ let Map = () => {
     // 🖱️ PAN (scroll / trackpad)
     // =========================
     setOffset((prev) => {
+      let dx = e.deltaX;
+      let dy = e.deltaY;
+
+      if (e.shiftKey) {
+        dx = -e.deltaY;
+        dy = 0;
+      }
+
       const next = {
-        x: prev.x - e.deltaX,
-        y: prev.y - e.deltaY,
+        x: prev.x - dx,
+        y: prev.y - dy,
       };
 
       return clampOffset(next.x, next.y, scale);
@@ -132,6 +163,8 @@ let Map = () => {
       >
         <World width={WORLD_WIDTH} height={WORLD_HEIGHT}>
           <GridLayer />
+          <PathLayer paths={paths} />
+          <NodeLayer nodes={nodes} />
           <AMRLayer amrs={amrs} />
         </World>
       </div>
@@ -139,4 +172,4 @@ let Map = () => {
   );
 };
 
-export default Map;
+export default View;

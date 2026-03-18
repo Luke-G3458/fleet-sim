@@ -1,5 +1,5 @@
 import "./index.css";
-import Map from "./components/Map";
+import View from "./components/View";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
         </aside>
 
         <section className="flex-1 pl-45 pr-10 overflow-y-auto bg-app-bg">
-          <Map />
+          <View />
         </section>
 
         <aside className="fixed right-0 top-10 bottom-10 w-10 bg-elevated-bg border-b border-border-subtle overflow-y-auto" />
