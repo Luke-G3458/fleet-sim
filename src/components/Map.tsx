@@ -18,6 +18,9 @@ let Map = () => {
   const amrs = [
     { id: 1, x: 300, y: 400 },
     { id: 2, x: 1200, y: 800 },
+    { id: 3, x: 100, y: 800 },
+    { id: 4, x: 600, y: 1200 },
+    { id: 5, x: 1500, y: 1500 },
   ];
 
   const clampOffset = (x: number, y: number, scale: number) => {
@@ -70,7 +73,7 @@ let Map = () => {
     // 🔍 ZOOM (pinch / ctrl+wheel)
     // =========================
     if (e.ctrlKey) {
-      const zoomFactor = 0.01;
+      const zoomFactor = 0.001;
 
       const newScale = Math.min(
         Math.max(scale - e.deltaY * zoomFactor, 0.2),

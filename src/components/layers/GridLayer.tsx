@@ -15,8 +15,8 @@ const GridLayer = () => {
           <path
             d="M 25 0 L 0 0 0 25"
             fill="none"
-            stroke="#f08a6e"
-            strokeWidth="0.5"
+            stroke="#443d35"
+            strokeWidth="3"
           />
         </pattern>
       </defs>

@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    {
+      "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "coords": "x,y"
+    }
+  ],
+  "paths": [
+    {
+      "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "start": "node_id",
+      "end": "node_id"
+    }
+  ]
+}

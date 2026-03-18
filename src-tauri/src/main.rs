@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    mir_sim_lib::run()
+    fleet_sim_lib::run()
 }

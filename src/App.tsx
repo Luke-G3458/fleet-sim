@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import "./index.css";
 import Map from "./components/Map";
 
@@ -10,11 +8,18 @@ function App() {
       </header>
 
       <main className="flex-1 flex pt-10 pb-10">
-        <aside className="fixed left-0 top-10 bottom-10 w-64 bg-elevated-bg border-b border-border-subtle overflow-y-auto">
-          Menu
+        <aside className="fixed left-0 top-10 bottom-10 w-45 bg-elevated-bg border-b border-border-subtle overflow-y-auto flex flex-col gap-4 items-center p-10">
+          <div className="flex h-20 w-20 items-center justify-center
+            bg-panel-bg border border-2 border-border-subtle rounded-xl
+            transition duration-200
+            hover:scale-105 hover:bg-rail/10 hover:border-rail hover:animate-pulse
+            hover:text-text-primary hover:font-bold text-sm text-text-muted"
+          >
+            Nodes
+          </div>
         </aside>
 
-        <section className="flex-1 pl-64 pr-10 overflow-y-auto bg-app-bg">
+        <section className="flex-1 pl-45 pr-10 overflow-y-auto bg-app-bg">
           <Map />
         </section>
 
