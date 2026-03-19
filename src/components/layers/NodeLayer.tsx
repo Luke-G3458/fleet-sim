@@ -4,15 +4,18 @@ type Props = {
   nodes: Node[];
   tool: Tool;
   draggingNodeId: React.MutableRefObject<string | null>;
+  selectedNodeId: string | null;
+  onNodeClick: (id: string) => void;
 };
 
-const NodeLayer = ({ nodes, tool, draggingNodeId }: Props) => {
+const NodeLayer = ({ nodes, tool, draggingNodeId, selectedNodeId, onNodeClick }: Props) => {
   return (
     <>
       {nodes.map((node) => (
         <div
           key={node.id}
-          className="absolute w-5 h-5 bg-[#d1664a] rounded-full cursor-pointer"
+          className={`absolute w-5 h-5 rounded-full cursor-pointer ${selectedNodeId === node.id ? "bg-rail-hover" : "bg-rail"
+            }`}
           style={{
             left: node.x,
             top: node.y,
@@ -26,6 +29,7 @@ const NodeLayer = ({ nodes, tool, draggingNodeId }: Props) => {
           }}
           onClick={(e) => {
             e.stopPropagation();
+            onNodeClick(node.id);
           }}
         />
       ))}

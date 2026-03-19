@@ -15,7 +15,9 @@ let View = ({ tool }: { tool: Tool }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const draggingNodeId = useRef<string | null>(null);
-  const didDrag = useRef(false);
+  const movedDuringDrag = useRef(false);
+
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const WORLD_WIDTH = 3000;
   const WORLD_HEIGHT = 3000;
@@ -33,9 +35,9 @@ let View = ({ tool }: { tool: Tool }) => {
     { id: "7", x: 900, y: 1200 },
   ]);
 
-  const paths: Path[] = [
+  const [paths, setPaths] = useState<Path[]>(([
     { id: "3", start: "6", end: "7" }
-  ];
+  ]));
 
   const screenToWorld = (clientX: number, clientY: number) => {
     const rect = containerRef.current!.getBoundingClientRect();
@@ -65,6 +67,8 @@ let View = ({ tool }: { tool: Tool }) => {
   };
 
   const onMouseDown = (e: React.MouseEvent) => {
+    movedDuringDrag.current = false;
+
     if (tool === "pan") {
       dragging.current = true;
       lastMouse.current = { x: e.clientX, y: e.clientY };
@@ -88,7 +92,7 @@ let View = ({ tool }: { tool: Tool }) => {
     }
 
     if (tool === "node" && draggingNodeId.current) {
-      didDrag.current = true;
+      movedDuringDrag.current = true;
 
       const { x, y } = screenToWorld(e.clientX, e.clientY);
 
@@ -102,22 +106,13 @@ let View = ({ tool }: { tool: Tool }) => {
 
   const stopDragging = () => {
     dragging.current = false;
-
-    if (draggingNodeId.current) {
-      didDrag.current = true;
-
-      setTimeout(() => {
-        didDrag.current = false;
-      }, 0);
-    }
-
     draggingNodeId.current = null;
   };
 
   const onClick = (e: React.MouseEvent) => {
     if (tool !== "node") return;
 
-    if (didDrag.current) return;
+    if (movedDuringDrag.current) return;
 
     const { x, y } = screenToWorld(e.clientX, e.clientY);
 
@@ -128,6 +123,32 @@ let View = ({ tool }: { tool: Tool }) => {
     };
 
     setNodes((prev) => [...prev, newNode]);
+    setSelectedNodeId(null);
+  };
+
+  const handleNodeClick = (nodeId: string) => {
+    if (tool !== "node") return;
+
+    if (movedDuringDrag.current) return;
+
+    if (!selectedNodeId) {
+      setSelectedNodeId(nodeId);
+      return;
+    }
+
+    if (selectedNodeId === nodeId) {
+      setSelectedNodeId(null);
+      return;
+    }
+
+    const newPath: Path = {
+      id: crypto.randomUUID(),
+      start: selectedNodeId,
+      end: nodeId,
+    };
+
+    setPaths((prev) => [...prev, newPath]);
+    setSelectedNodeId(null);
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -202,6 +223,8 @@ let View = ({ tool }: { tool: Tool }) => {
             nodes={nodes}
             tool={tool}
             draggingNodeId={draggingNodeId}
+            selectedNodeId={selectedNodeId}
+            onNodeClick={handleNodeClick}
           />
           <AMRLayer amrs={amrs} />
         </World>
