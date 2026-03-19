@@ -1,9 +1,6 @@
-type Props = {
-  x: number;
-  y: number;
-};
+import { AMRType } from "../types/types.ts";
 
-const AMR = ({ x, y }: Props) => {
+const AMR = ({ amr }: { amr: AMRType }) => {
   return (
     <div
       className="absolute h-20 w-30 z-10
@@ -12,8 +9,8 @@ const AMR = ({ x, y }: Props) => {
         hover:bg-[#4a2419] hover:border-[#a0553b] hover:animate-pulse
         rounded-xl flex items-center justify-center"
       style={{
-        left: x,
-        top: y,
+        left: amr.x,
+        top: amr.y,
         transform: "translate(-50%, -50%)", // center on position
       }}
     >

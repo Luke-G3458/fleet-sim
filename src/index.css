@@ -147,6 +147,10 @@
   }
 }
 
+::selection {
+  @apply bg-rail/20;
+}
+
 /* ===============================
    Styled Scrollbars
    Dark-themed scrollbars matching color scheme

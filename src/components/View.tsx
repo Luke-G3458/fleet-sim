@@ -4,8 +4,9 @@ import GridLayer from "./layers/GridLayer";
 import AMRLayer from "./layers/AMRLayer";
 import NodeLayer from "./layers/NodeLayer";
 import PathLayer from "./layers/PathLayer";
+import { Path, Node, AMRType, Tool } from "../types/types";
 
-let View = () => {
+let View = ({ tool }: { tool: Tool }) => {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -13,38 +14,37 @@ let View = () => {
   const lastMouse = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const WORLD_WIDTH = 2000;
-  const WORLD_HEIGHT = 2000;
+  const draggingNodeId = useRef<string | null>(null);
+  const didDrag = useRef(false);
 
-  // Example data (replace later with real state/backend)
-  const amrs = [
-    { id: 1, x: 300, y: 400 },
-    { id: 2, x: 1200, y: 800 },
-    { id: 3, x: 100, y: 800 },
-    { id: 4, x: 600, y: 1200 },
-    { id: 5, x: 1500, y: 1500 },
+  const WORLD_WIDTH = 3000;
+  const WORLD_HEIGHT = 3000;
+
+  const amrs: AMRType[] = [
+    { id: "1", x: 300, y: 400 },
+    { id: "2", x: 1200, y: 800 },
+    { id: "3", x: 100, y: 800 },
+    { id: "4", x: 600, y: 1200 },
+    { id: "5", x: 1500, y: 1500 },
   ];
 
-  const nodes = [
-    { id: "1", x: 100, y: 300 },
-    { id: "2", x: 800, y: 1200 },
-  ]
+  const [nodes, setNodes] = useState<Node[]>([
+    { id: "6", x: 100, y: 300 },
+    { id: "7", x: 900, y: 1200 },
+  ]);
 
-  const paths = [
-    {
-      id: "3",
-      start: {
-        id: "1",
-        x: 100,
-        y: 300
-      },
-      end: {
-        id: "2",
-        x: 800,
-        y: 1200
-      }
-    }
-  ]
+  const paths: Path[] = [
+    { id: "3", start: "6", end: "7" }
+  ];
+
+  const screenToWorld = (clientX: number, clientY: number) => {
+    const rect = containerRef.current!.getBoundingClientRect();
+
+    const x = (clientX - rect.left - offset.x) / scale;
+    const y = (clientY - rect.top - offset.y) / scale;
+
+    return { x, y };
+  };
 
   const clampOffset = (x: number, y: number, scale: number) => {
     const container = containerRef.current;
@@ -64,37 +64,75 @@ let View = () => {
     };
   };
 
-  //  Pan
   const onMouseDown = (e: React.MouseEvent) => {
-    dragging.current = true;
-    lastMouse.current = { x: e.clientX, y: e.clientY };
+    if (tool === "pan") {
+      dragging.current = true;
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+    }
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!dragging.current) return;
+    if (tool === "pan") {
+      if (!dragging.current) return;
 
-    const dx = e.clientX - lastMouse.current.x;
-    const dy = e.clientY - lastMouse.current.y;
+      const dx = e.clientX - lastMouse.current.x;
+      const dy = e.clientY - lastMouse.current.y;
 
-    setOffset((prev) => {
-      const next = { x: prev.x + dx, y: prev.y + dy };
-      return clampOffset(next.x, next.y, scale);
-    });
+      setOffset((prev) => {
+        const next = { x: prev.x + dx, y: prev.y + dy };
+        return clampOffset(next.x, next.y, scale);
+      });
 
-    lastMouse.current = { x: e.clientX, y: e.clientY };
+      lastMouse.current = { x: e.clientX, y: e.clientY };
+      return;
+    }
+
+    if (tool === "node" && draggingNodeId.current) {
+      didDrag.current = true;
+
+      const { x, y } = screenToWorld(e.clientX, e.clientY);
+
+      setNodes((prev) =>
+        prev.map((n) =>
+          n.id === draggingNodeId.current ? { ...n, x, y } : n
+        )
+      );
+    }
   };
 
   const stopDragging = () => {
     dragging.current = false;
+
+    if (draggingNodeId.current) {
+      didDrag.current = true;
+
+      setTimeout(() => {
+        didDrag.current = false;
+      }, 0);
+    }
+
+    draggingNodeId.current = null;
   };
 
-  //  Zoom (ctrl/pinch)
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault(); // 🔥 always stop browser behavior
+  const onClick = (e: React.MouseEvent) => {
+    if (tool !== "node") return;
 
-    // =========================
-    // 🔍 ZOOM (pinch / ctrl+wheel)
-    // =========================
+    if (didDrag.current) return;
+
+    const { x, y } = screenToWorld(e.clientX, e.clientY);
+
+    const newNode: Node = {
+      id: crypto.randomUUID(),
+      x,
+      y,
+    };
+
+    setNodes((prev) => [...prev, newNode]);
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+
     if (e.ctrlKey) {
       const zoomFactor = 0.001;
 
@@ -118,13 +156,9 @@ let View = () => {
 
       setScale(newScale);
       setOffset(newOffset);
-
       return;
     }
 
-    // =========================
-    // 🖱️ PAN (scroll / trackpad)
-    // =========================
     setOffset((prev) => {
       let dx = e.deltaX;
       let dy = e.deltaY;
@@ -152,9 +186,9 @@ let View = () => {
       onMouseMove={onMouseMove}
       onMouseUp={stopDragging}
       onMouseLeave={stopDragging}
+      onClick={onClick}
       style={{ overscrollBehavior: "none", touchAction: "none" }}
     >
-      {/* Camera */}
       <div
         className="absolute top-0 left-0 origin-top-left"
         style={{
@@ -163,8 +197,12 @@ let View = () => {
       >
         <World width={WORLD_WIDTH} height={WORLD_HEIGHT}>
           <GridLayer />
-          <PathLayer paths={paths} />
-          <NodeLayer nodes={nodes} />
+          <PathLayer paths={paths} nodes={nodes} x={WORLD_WIDTH} y={WORLD_HEIGHT} />
+          <NodeLayer
+            nodes={nodes}
+            tool={tool}
+            draggingNodeId={draggingNodeId}
+          />
           <AMRLayer amrs={amrs} />
         </World>
       </div>

@@ -1,16 +1,11 @@
 import AMR from "../AMR";
-
-type AMRType = {
-  id: number;
-  x: number;
-  y: number;
-};
+import { AMRType } from "../../types/types.ts";
 
 const AMRLayer = ({ amrs }: { amrs: AMRType[] }) => {
   return (
     <>
       {amrs.map((amr) => (
-        <AMR key={amr.id} x={amr.x} y={amr.y} />
+        <AMR key={amr.id} amr={amr} />
       ))}
     </>
   );
