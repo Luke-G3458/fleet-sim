@@ -198,6 +198,11 @@ let View = ({ tool }: { tool: Tool }) => {
     });
   };
 
+  const handleDeleteNode = (node: Node) => {
+    setNodes(nodes.filter((n) => n.id !== node.id));
+    setPaths(paths.filter((p) => p.start !== node.id && p.end !== node.id));
+  };
+
   return (
     <div
       ref={containerRef}
@@ -225,6 +230,7 @@ let View = ({ tool }: { tool: Tool }) => {
             draggingNodeId={draggingNodeId}
             selectedNodeId={selectedNodeId}
             onNodeClick={handleNodeClick}
+            deleteNode={handleDeleteNode}
           />
           <AMRLayer amrs={amrs} />
         </World>
