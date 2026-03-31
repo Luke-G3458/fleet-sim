@@ -4,6 +4,7 @@ import GridLayer from "./layers/GridLayer";
 import AMRLayer from "./layers/AMRLayer";
 import NodeLayer from "./layers/NodeLayer";
 import PathLayer from "./layers/PathLayer";
+import SelectionLayer from "./layers/SelectionLayer";
 import { Path, Node, AMRType, Tool } from "../types/types";
 
 let View = ({ tool }: { tool: Tool }) => {
@@ -18,6 +19,10 @@ let View = ({ tool }: { tool: Tool }) => {
   const movedDuringDrag = useRef(false);
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
+  const [selectStartPoint, setSelectStartPoint] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+  const [selectEndPoint, setSelectEndPoint] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+  const [selecting, setSelecting] = useState(false);
 
   const WORLD_WIDTH = 3000;
   const WORLD_HEIGHT = 3000;
@@ -72,7 +77,13 @@ let View = ({ tool }: { tool: Tool }) => {
     if (tool === "pan") {
       dragging.current = true;
       lastMouse.current = { x: e.clientX, y: e.clientY };
-    }
+    } else if (tool === "select") {
+      dragging.current = true;
+      setSelecting(true);
+      const coords = screenToWorld(e.clientX, e.clientY);
+      setSelectEndPoint({ x: coords.x, y: coords.y });
+      setSelectStartPoint({ x: coords.x, y: coords.y });
+    };
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
@@ -88,6 +99,14 @@ let View = ({ tool }: { tool: Tool }) => {
       });
 
       lastMouse.current = { x: e.clientX, y: e.clientY };
+      return;
+    }
+
+    if (tool === "select") {
+      if (!dragging.current) return;
+
+      const coords = screenToWorld(e.clientX, e.clientY);
+      setSelectEndPoint({ x: coords.x, y: coords.y });
       return;
     }
 
@@ -110,7 +129,8 @@ let View = ({ tool }: { tool: Tool }) => {
   };
 
   const onClick = (e: React.MouseEvent) => {
-    if (tool !== "node") return;
+    setSelecting(false);
+    if (tool === "pan" || tool === "select") return;
 
     if (movedDuringDrag.current) return;
 
@@ -127,6 +147,7 @@ let View = ({ tool }: { tool: Tool }) => {
   };
 
   const handleNodeClick = (nodeId: string) => {
+    setSelecting(false);
     if (tool !== "node") return;
 
     if (movedDuringDrag.current) return;
@@ -155,7 +176,7 @@ let View = ({ tool }: { tool: Tool }) => {
     e.preventDefault();
 
     if (e.ctrlKey) {
-      const zoomFactor = 0.001;
+      const zoomFactor = 0.0005;
 
       const newScale = Math.min(
         Math.max(scale - e.deltaY * zoomFactor, 0.2),
@@ -185,7 +206,7 @@ let View = ({ tool }: { tool: Tool }) => {
       let dy = e.deltaY;
 
       if (e.shiftKey) {
-        dx = -e.deltaY;
+        dx = e.deltaY;
         dy = 0;
       }
 
@@ -233,6 +254,12 @@ let View = ({ tool }: { tool: Tool }) => {
             deleteNode={handleDeleteNode}
           />
           <AMRLayer amrs={amrs} />
+          {
+            selecting && <SelectionLayer
+              startingPoint={selectStartPoint}
+              endingPoint={selectEndPoint}
+            />
+          }
         </World>
       </div>
     </div>

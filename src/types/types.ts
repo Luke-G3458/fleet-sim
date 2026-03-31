@@ -16,4 +16,4 @@ export type AMRType = {
 	y: number
 }
 
-export type Tool = "pan" | "node"
+export type Tool = "pan" | "node" | "select"

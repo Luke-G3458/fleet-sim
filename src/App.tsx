@@ -36,6 +36,17 @@ function App() {
           >
             Nodes
           </div>
+          <div
+            className={`flex h-20 w-20 items-center justify-center
+              bg-panel-bg border border-2 border-border-subtle rounded-xl
+              transition duration-200 text-sm text-text-muted
+              ${pointerTool === "select" ? `opacity-50` :
+                `hover:scale-105 hover:bg-rail/10 hover:border-rail hover:animate-pulse hover:text-text-primary active:scale-99`}`
+            }
+            onClick={() => setPointerTool("select")}
+          >
+            Select
+          </div>
         </aside>
 
         <section className="flex-1 pl-45 pr-10 overflow-y-auto bg-app-bg">
